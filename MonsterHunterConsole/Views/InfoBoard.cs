@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace MonsterHunterConsole.Views
 {
-    internal class InfoBoard
+    public static class InfoBoard
     {
+        public static void DisplayInfo(string message)
+        {
+            Console.WriteLine($"[信息] {message}");
+        }
     }
 }
