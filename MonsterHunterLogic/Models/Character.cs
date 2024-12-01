@@ -16,6 +16,11 @@ namespace MonsterHunterLogic.Models
         public int Armor { get; private set; }
         public int FreezeTime { get; protected set; }
 
+        protected void SetPosition(int newX, int newY)
+        {
+            X = newX;
+            Y = newY;
+        }
         protected Character(int x, int y, int maxHP, int strength, int armor)
         {
             X = x;

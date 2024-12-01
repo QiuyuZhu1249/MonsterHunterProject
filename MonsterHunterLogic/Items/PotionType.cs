@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace MonsterHunterLogic.Items
 {
-    internal class PotionType
+    public enum PotionType
     {
+        Strength,
+        Poisoned,
+        Invisibility,
+        Speed
     }
 }
