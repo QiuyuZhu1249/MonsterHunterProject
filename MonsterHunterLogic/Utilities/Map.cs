@@ -16,8 +16,9 @@ namespace MonsterHunterLogic.Utilities
         public void LoadMap(string filePath)
         {
             if (!File.Exists(filePath))
-                throw new FileNotFoundException($"地图文件未找到：{filePath}");
-
+            {
+                throw new FileNotFoundException($"didn't find the map files：{filePath}");
+            }
             string[] lines = File.ReadAllLines(filePath);
             Height = lines.Length;
             Width = lines[0].Length;

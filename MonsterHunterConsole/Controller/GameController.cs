@@ -11,7 +11,7 @@ namespace MonsterHunterConsole.Controller
     public class GameController
     {
         private bool isRunning;
-        private string[] maps = { "Castle.map", "Marsh.map", "Hell.map" };
+        private string[] maps = { "Maps/Castle.map", "Maps/Marsh.map", "Maps/Hell.map" };
 
         public void Start()
         {
@@ -75,13 +75,13 @@ namespace MonsterHunterConsole.Controller
                 Console.Clear();
                 Console.WriteLine($"Loading the map：{mapFile}");
                 map.DisplayMap(); // 显示地图内容
-                Console.WriteLine("\nPress any button to go back...");
+                Console.WriteLine("\n Press any button to go back...");
                 Console.ReadKey();
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Failed loading the map：{ex.Message}");
-                Console.WriteLine("\nPress any button to go back...");
+                Console.WriteLine("\n Press any button to go back...");
                 Console.ReadKey();
             }
         }
