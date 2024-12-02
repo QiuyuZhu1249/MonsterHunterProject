@@ -52,6 +52,14 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\MonsterHunterLogic\MonsterHunterLogic.csproj">
+      <Project>{b1504706-f47f-46da-8b42-ad93c68f8ce6}</Project>
+      <Name>MonsterHunterLogic</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="MapsFile\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
