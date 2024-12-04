@@ -41,7 +41,7 @@ namespace MonsterHunterForm
 
                 Font = new System.Drawing.Font("Arial", 24, System.Drawing.FontStyle.Bold),
                 AutoSize = true,
-                Location = new System.Drawing.Point((this.ClientSize.Width - 400) / 2, 150), // 居中
+                Location = new System.Drawing.Point((this.ClientSize.Width - 400) / 2, 150), 
                 TextAlign = System.Drawing.ContentAlignment.MiddleCenter
             };
 
@@ -80,5 +80,6 @@ namespace MonsterHunterForm
             this.Controls.Add(startButton);
             this.Controls.Add(exitButton);
         }
+
     }
 }

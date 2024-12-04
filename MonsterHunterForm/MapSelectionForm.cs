@@ -47,19 +47,19 @@ namespace MonsterHunterForm
             };
             castleButton.Click += (sender, e) =>
             {
-                MessageBox.Show("You Choose the map：Castle");
+                OpenMap("Maps/Castle.map");
             };
 
-            Button swampButton = new Button
+            Button marshButton = new Button
             {
                 Text = "Marsh",
                 Font = new System.Drawing.Font("Arial", 14),
                 Size = new System.Drawing.Size(150, 50),
                 Location = new System.Drawing.Point((this.ClientSize.Width - 150) / 2, 200)
             };
-            swampButton.Click += (sender, e) =>
+            marshButton.Click += (sender, e) =>
             {
-                MessageBox.Show("You Choose the map：Marsh");
+                OpenMap("Maps/Marsh.map");
             };
 
             Button hellButton = new Button
@@ -71,7 +71,7 @@ namespace MonsterHunterForm
             };
             hellButton.Click += (sender, e) =>
             {
-                MessageBox.Show("You Choose the map：Hell");
+                OpenMap("Maps/Hell.map");
             };
 
             // add go back button
@@ -91,9 +91,14 @@ namespace MonsterHunterForm
 
             this.Controls.Add(mapLabel);
             this.Controls.Add(castleButton);
-            this.Controls.Add(swampButton);
             this.Controls.Add(hellButton);
             this.Controls.Add(backButton);
         }
+        private void OpenMap(string mapFilePath)
+        {
+            MapDisplayForm mapDisplayForm = new MapDisplayForm(mapFilePath);
+            mapDisplayForm.ShowDialog();
+        }
+
     }
 }
