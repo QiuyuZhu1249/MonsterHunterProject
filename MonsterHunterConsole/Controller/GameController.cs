@@ -5,13 +5,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MonsterHunterLogic.Utilities;
+using MonsterHunterLogic.Models;
 
 namespace MonsterHunterConsole.Controller
 {
     public class GameController
     {
         private bool isRunning;
-        private string[] maps = { "Maps/Castle.map", "Maps/Marsh.map", "Maps/Hell.map" };
+        private string[] maps = { "Maps/Castle.map", "Maps/Marsh.map", "Maps/Hell.map" }; 
+        private Map currentMap;
+        private int playerX; 
+        private int playerY; 
 
         public void Start()
         {
@@ -58,31 +62,102 @@ namespace MonsterHunterConsole.Controller
                     int mapIndex = input - ConsoleKey.D1;
                     string selectedMap = maps[mapIndex];
 
-                    LoadAndDisplayMap(selectedMap);
-
-                    ShowMapSelectionScreen();
+                    LoadAndStartGame(selectedMap);
                 }
             }
         }
 
-        private void LoadAndDisplayMap(string mapFile)
+        private void LoadAndStartGame(string mapFile)
         {
-            Map map = new Map();
+            currentMap = new Map();
 
             try
             {
-                map.LoadMap(mapFile); // 加载地图文件
-                Console.Clear();
-                Console.WriteLine($"Loading the map：{mapFile}");
-                map.DisplayMap(); // 显示地图内容
-                Console.WriteLine("\n Press any button to go back...");
-                Console.ReadKey();
+                currentMap.LoadMap(mapFile);
+
+                FindPlayerStartPosition();
+
+                StartGameLoop();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Failed loading the map：{ex.Message}");
-                Console.WriteLine("\n Press any button to go back...");
-                Console.ReadKey();
+                Console.WriteLine($"Fail loading map ：{ex.Message}");
+                Console.WriteLine("\n Press B to go back the map selection...");
+
+                while (true)
+                {
+                    var input = Console.ReadKey(true).Key;
+                    if (input == ConsoleKey.B)
+                    {
+                        ShowMapSelectionScreen();
+                        break;
+                    }
+                }
+            }
+        }
+
+        private void FindPlayerStartPosition()
+        {
+            for (int i = 0; i < currentMap.Height; i++)
+            {
+                for (int j = 0; j < currentMap.Width; j++)
+                {
+                    if (currentMap.MapData[i, j] == 'H')
+                    {
+                        playerX = j;
+                        playerY = i;
+                        return;
+                    }
+                }
+            }
+
+            throw new Exception("Didn't find the original position of the character ('H')！");
+        }
+
+        private void StartGameLoop()
+        {
+            while (true)
+            {
+                Console.Clear();
+                currentMap.DisplayMap();
+
+                Console.WriteLine("\n Please use arrow button to move the hunter");
+
+                var input = Console.ReadKey(true).Key;
+
+                if (input == ConsoleKey.Q)
+                {
+                    ShowMapSelectionScreen();
+                    break;
+                }
+
+                HandlePlayerMovement(input);
+            }
+        }
+
+        private void HandlePlayerMovement(ConsoleKey input)
+        {
+            int newX = playerX;
+            int newY = playerY;
+
+            if (input == ConsoleKey.UpArrow)
+                newY--;
+            else if (input == ConsoleKey.DownArrow)
+                newY++;
+            else if (input == ConsoleKey.LeftArrow)
+                newX--;
+            else if (input == ConsoleKey.RightArrow)
+                newX++;
+
+            if (newX >= 0 && newX < currentMap.Width && newY >= 0 && newY < currentMap.Height)
+            {
+                if (currentMap.MapData[newY, newX] != '#')
+                {
+                    currentMap.MapData[playerY, playerX] = ' '; 
+                    playerX = newX;
+                    playerY = newY;
+                    currentMap.MapData[playerY, playerX] = 'H';
+                }
             }
         }
 
