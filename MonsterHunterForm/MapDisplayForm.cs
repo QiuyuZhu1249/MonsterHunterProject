@@ -17,6 +17,9 @@ namespace MonsterHunterForm
         private char[,] mapData;
         private PictureBox[,] pictureBoxes;
         private Point hunterPosition;
+        private Point monsterPosition; // 怪物位置
+        private bool hasSword = false;
+        private Timer monsterTimer; // 用于控制怪物移动的计时器
 
         public MapDisplayForm(string mapFilePath)
         {
@@ -69,6 +72,14 @@ namespace MonsterHunterForm
             };
             backButton.Click += (sender, e) => this.Close();
             this.Controls.Add(backButton);
+
+            // Initialize monster movement timer
+            monsterTimer = new Timer
+            {
+                Interval = 2000 // 每2秒触发一次
+            };
+            monsterTimer.Tick += MonsterTimer_Tick;
+            monsterTimer.Start();
         }
 
         private string[] LoadMapFile(string mapFilePath)
@@ -95,9 +106,13 @@ namespace MonsterHunterForm
                 for (int col = 0; col < mapLines[row].Length; col++)
                 {
                     mapData[row, col] = mapLines[row][col];
-                    if (mapData[row, col] == 'H') 
+                    if (mapData[row, col] == 'H')
                     {
                         hunterPosition = new Point(col, row);
+                    }
+                    else if (mapData[row, col] == 'M')
+                    {
+                        monsterPosition = new Point(col, row);
                     }
                 }
             }
@@ -141,7 +156,7 @@ namespace MonsterHunterForm
                 case 'h': return Image.FromFile(Path.Combine(resourcePath, "Shield.jpg"));
                 case 'w': return Image.FromFile(Path.Combine(resourcePath, "Sword.jpg"));
                 case '#': return Image.FromFile(Path.Combine(resourcePath, "Wall.jpg"));
-                case ' ': return null; // Empty space
+                case ' ': return null;
                 default: return null;
             }
         }
@@ -154,9 +169,9 @@ namespace MonsterHunterForm
             switch (e.KeyCode)
             {
                 case Keys.W: dy = -1; break;
-                case Keys.S: dy = 1; break;  
-                case Keys.A: dx = -1; break; 
-                case Keys.D: dx = 1; break;  
+                case Keys.S: dy = 1; break;
+                case Keys.A: dx = -1; break;
+                case Keys.D: dx = 1; break;
                 default: return;
             }
 
@@ -169,20 +184,89 @@ namespace MonsterHunterForm
             int newY = hunterPosition.Y + dy;
 
             if (newX < 0 || newX >= mapData.GetLength(1) || newY < 0 || newY >= mapData.GetLength(0)) return;
+            
             if (mapData[newY, newX] == '#') return;
+
+            if (mapData[newY, newX] == '#')
+            {
+                if (mapData[hunterPosition.Y, hunterPosition.X] == 'x')
+                {
+                    MessageBox.Show("You used the pickaxe to break the wall!", "Wall Broken", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    mapData[newY, newX] = ' '; 
+                    pictureBoxes[newY, newX].Image = null;
+                }
+                return;
+            }
+
 
             if (mapData[newY, newX] == 'G')
             {
-                MessageBox.Show("Congratulations, game win！", "Victory", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;   
+                MessageBox.Show("Congratulations, you won!", "Victory", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            else if (mapData[newY, newX] == 'M')
+            {
+                if (hasSword)
+                {
+                    MessageBox.Show("You killed the monster with your sword!", "Victory", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    mapData[newY, newX] = ' ';
+                }
+                else
+                {
+                    MessageBox.Show("You were killed by the monster!", "Game Over", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    this.Close();
+                    return;
+                }
+            }
+            else if (mapData[newY, newX] == 'w')
+            {
+                hasSword = true;
+                MessageBox.Show("You picked up a sword!", "Item Acquired", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                mapData[newY, newX] = ' ';
+             }
+            else if (mapData[newY, newX] == 'x')
+            {
+                MessageBox.Show("You picked up a pickaxe!", "Item Acquired", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                mapData[newY, newX] = ' ';
             }
 
-            mapData[hunterPosition.Y, hunterPosition.X] = ' '; 
-            mapData[newY, newX] = 'H'; 
+            mapData[hunterPosition.Y, hunterPosition.X] = ' ';
+            mapData[newY, newX] = 'H';
             hunterPosition = new Point(newX, newY);
 
             pictureBoxes[hunterPosition.Y, hunterPosition.X].Image = GetImageForCell('H');
-            pictureBoxes[newY - dy, newX - dx].Image = GetImageForCell(' '); 
+            pictureBoxes[newY - dy, newX - dx].Image = GetImageForCell(' ');
+        }
+
+        private void MonsterTimer_Tick(object sender, EventArgs e)
+        {
+            MoveMonsterTowardsHunter();
+        }
+
+        private void MoveMonsterTowardsHunter()
+        {
+            int dx = 0, dy = 0;
+
+            // Determine the direction to move the monster closer to the hunter
+            if (monsterPosition.X < hunterPosition.X) dx = 1;
+            else if (monsterPosition.X > hunterPosition.X) dx = -1;
+
+            if (monsterPosition.Y < hunterPosition.Y) dy = 1;
+            else if (monsterPosition.Y > hunterPosition.Y) dy = -1;
+
+            int newX = monsterPosition.X + dx;
+            int newY = monsterPosition.Y + dy;
+
+            // Check if the move is valid
+            if (newX < 0 || newX >= mapData.GetLength(1) || newY < 0 || newY >= mapData.GetLength(0)) return;
+            if (mapData[newY, newX] == '#' || mapData[newY, newX] == 'M') return;
+
+            // Update the map and monster position
+            mapData[monsterPosition.Y, monsterPosition.X] = ' ';
+            mapData[newY, newX] = 'M';
+            pictureBoxes[monsterPosition.Y, monsterPosition.X].Image = null;
+            pictureBoxes[newY, newX].Image = GetImageForCell('M');
+            monsterPosition = new Point(newX, newY);
         }
     }
 }
