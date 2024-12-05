@@ -168,18 +168,21 @@ namespace MonsterHunterForm
             int newX = hunterPosition.X + dx;
             int newY = hunterPosition.Y + dy;
 
-            // Check boundaries and collisions
             if (newX < 0 || newX >= mapData.GetLength(1) || newY < 0 || newY >= mapData.GetLength(0)) return;
-            if (mapData[newY, newX] == '#') return; 
+            if (mapData[newY, newX] == '#') return;
 
-            // Update map data
-            mapData[hunterPosition.Y, hunterPosition.X] = ' ';
+            if (mapData[newY, newX] == 'G')
+            {
+                MessageBox.Show("Congratulations, game win！", "Victory", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;   
+            }
+
+            mapData[hunterPosition.Y, hunterPosition.X] = ' '; 
             mapData[newY, newX] = 'H'; 
             hunterPosition = new Point(newX, newY);
 
-            // Update display
-            pictureBoxes[hunterPosition.Y, hunterPosition.X].Image = GetImageForCell('H'); 
+            pictureBoxes[hunterPosition.Y, hunterPosition.X].Image = GetImageForCell('H');
             pictureBoxes[newY - dy, newX - dx].Image = GetImageForCell(' '); 
         }
     }
-}0
+}

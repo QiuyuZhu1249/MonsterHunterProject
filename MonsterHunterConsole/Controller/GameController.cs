@@ -132,6 +132,13 @@ namespace MonsterHunterConsole.Controller
                 }
 
                 HandlePlayerMovement(input);
+
+                if (currentMap.MapData[playerY, playerX] == 'G')
+                {
+                    Console.Clear();
+                    Console.WriteLine("Congratulations! You reached the goal and won the game!");
+                    break;
+                }
             }
         }
 
