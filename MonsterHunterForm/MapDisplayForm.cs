@@ -162,6 +162,23 @@ namespace MonsterHunterForm
             }
         }
 
+        //Types of potions
+        private enum PotionType
+        {
+            Poisoned,
+            Speed,
+            Invisibility,
+            Healing,
+            Strength
+        }
+
+        //Random potions
+        private PotionType GenerateRandomPotion()
+        {
+            Array potionTypes = Enum.GetValues(typeof(PotionType));
+            Random random = new Random();
+            return (PotionType)potionTypes.GetValue(random.Next(potionTypes.Length));
+        }
         private void MapDisplayForm_KeyDown(object sender, KeyEventArgs e)
         {
             int dx = 0, dy = 0;
@@ -184,23 +201,22 @@ namespace MonsterHunterForm
             int newX = hunterPosition.X + dx;
             int newY = hunterPosition.Y + dy;
 
-            // 检查边界
+            
             if (newX < 0 || newX >= mapData.GetLength(1) || newY < 0 || newY >= mapData.GetLength(0)) return;
 
-            // 如果玩家尝试移动到墙壁
+            
             if (mapData[newY, newX] == '#')
             {
-                // 玩家拥有稿子时可以破坏墙壁
+                
                 if (hasPickaxe)
                 {
                     MessageBox.Show("You used the pickaxe to break the wall!", "Wall Broken", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    mapData[newY, newX] = ' '; // 将墙变为空地
-                    pictureBoxes[newY, newX].Image = null; // 更新图像
+                    mapData[newY, newX] = ' '; 
+                    pictureBoxes[newY, newX].Image = null; 
                 }
                 return;
             }
 
-            // 处理其他格子
             if (mapData[newY, newX] == 'G')
             {
                 MessageBox.Show("Congratulations, you won!", "Victory", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -228,10 +244,17 @@ namespace MonsterHunterForm
             }
             else if (mapData[newY, newX] == 'x')
             {
-                hasPickaxe = true; // 标记玩家已拥有稿子
+                hasPickaxe = true;
                 MessageBox.Show("You picked up a pickaxe!", "Item Acquired", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                mapData[newY, newX] = ' '; // 清空稿子
+                mapData[newY, newX] = ' '; 
             }
+            else if (mapData[newY, newX] == 'p')
+            {
+                PotionType potion = GenerateRandomPotion();
+                MessageBox.Show($"You picked up a {potion} potion!", "Potion Acquired", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                mapData[newY, newX] = ' '; 
+            }
+
             mapData[hunterPosition.Y, hunterPosition.X] = ' ';
             mapData[newY, newX] = 'H';
             hunterPosition = new Point(newX, newY);
