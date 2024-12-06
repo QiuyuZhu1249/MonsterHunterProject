@@ -82,6 +82,7 @@ namespace MonsterHunterForm
             monsterTimer.Start();
         }
 
+        private bool hasPickaxe = false; 
         private string[] LoadMapFile(string mapFilePath)
         {
             try
@@ -183,22 +184,23 @@ namespace MonsterHunterForm
             int newX = hunterPosition.X + dx;
             int newY = hunterPosition.Y + dy;
 
+            // 检查边界
             if (newX < 0 || newX >= mapData.GetLength(1) || newY < 0 || newY >= mapData.GetLength(0)) return;
-            
-            if (mapData[newY, newX] == '#') return;
 
+            // 如果玩家尝试移动到墙壁
             if (mapData[newY, newX] == '#')
             {
-                if (mapData[hunterPosition.Y, hunterPosition.X] == 'x')
+                // 玩家拥有稿子时可以破坏墙壁
+                if (hasPickaxe)
                 {
                     MessageBox.Show("You used the pickaxe to break the wall!", "Wall Broken", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    mapData[newY, newX] = ' '; 
-                    pictureBoxes[newY, newX].Image = null;
+                    mapData[newY, newX] = ' '; // 将墙变为空地
+                    pictureBoxes[newY, newX].Image = null; // 更新图像
                 }
                 return;
             }
 
-
+            // 处理其他格子
             if (mapData[newY, newX] == 'G')
             {
                 MessageBox.Show("Congratulations, you won!", "Victory", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -223,13 +225,13 @@ namespace MonsterHunterForm
                 hasSword = true;
                 MessageBox.Show("You picked up a sword!", "Item Acquired", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 mapData[newY, newX] = ' ';
-             }
+            }
             else if (mapData[newY, newX] == 'x')
             {
+                hasPickaxe = true; // 标记玩家已拥有稿子
                 MessageBox.Show("You picked up a pickaxe!", "Item Acquired", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                mapData[newY, newX] = ' ';
+                mapData[newY, newX] = ' '; // 清空稿子
             }
-
             mapData[hunterPosition.Y, hunterPosition.X] = ' ';
             mapData[newY, newX] = 'H';
             hunterPosition = new Point(newX, newY);
